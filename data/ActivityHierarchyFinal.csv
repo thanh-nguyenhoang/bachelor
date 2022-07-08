@@ -1,0 +1,11 @@
+RADIOLOGICAL EXAM REQUEST,Clinical Requests,Clinical Requests,Clinical Activities,General Activities,NULL
+SPECIALIST REQUEST,Clinical Requests,Clinical Requests,Clinical Activities,General Activities,NULL
+LAB REQUEST,Clinical Requests,Clinical Requests,Clinical Activities,General Activities,NULL
+ED ACTIVITY,Ed Activity,Clinical Solutions,Clinical Activities,General Activities,NULL
+RADIOLOGICAL EXAM REPORT,Clinical Response,Clinical Solutions,Clinical Activities,General Activities,NULL
+SPECIALIST REFERRAL,Clinical Response,Clinical Solutions,Clinical Activities,General Activities,NULL
+LAB REPORT,Clinical Response,Clinical Solutions,Clinical Activities,General Activities,NULL
+DISCHARGE,Person Route,Complete Route,Complete Route,General Activities,NULL
+FIRST VISIT,Person Route,Complete Route,Complete Route,General Activities,NULL
+TRIAGE,sorting,Complete Route,Complete Route,General Activities,NULL
+NULL,NULL,NULL,NULL,NULL,NULL
