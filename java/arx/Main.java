@@ -89,7 +89,7 @@ public class Main{
 		String sTotal = var10000 + "s";
 		System.out.println(" - Time needed: " + sTotal);
 		ARXLattice.ARXNode optimum = result.getGlobalOptimum();
-		List<String> qis = new ArrayList(data.getDefinition().getQuasiIdentifyingAttributes());
+		List<String> qis = new ArrayList<String>(data.getDefinition().getQuasiIdentifyingAttributes());
 		if (optimum == null) {
 			System.out.println(" - No solution found!");
 		} else {
