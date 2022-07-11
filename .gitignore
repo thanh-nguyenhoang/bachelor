@@ -5,3 +5,7 @@ associationNaiv.csv
 generalizedData.csv
 finalData.csv
 naiv.deid
+log**
+results/step3/**
+img/results/**
+!img/results/.gitkeep

@@ -19,70 +19,10 @@ import org.deidentifier.arx.metric.InformationLoss;
 import org.deidentifier.arx.ARXResult;
 import org.deidentifier.arx.Data;
 import org.deidentifier.arx.DataHandle;
+import org.deidentifier.arx.aggregates.StatisticsQuality;
 import org.deidentifier.arx.metric.Metric;
-import org.deidentifier.arx.metric.v2.__MetricV2;
-
+import org.deidentifier.arx.criteria.KMap;
 public class Main{
-
-	protected static void print(DataHandle handle) {
-		Iterator<String[]> itHandle = handle.iterator();
-		print(itHandle);
-	}
-
-	protected static void print(Iterator<String[]> iterator) {
-		while(iterator.hasNext()) {
-			System.out.print("   ");
-			System.out.println(Arrays.toString((Object[])iterator.next()));
-		}
-
-	}
-
-	protected static void printArray(String[][] array) {
-		System.out.print("{");
-
-		for(int j = 0; j < array.length; ++j) {
-			String[] next = array[j];
-			System.out.print("{");
-
-			for(int i = 0; i < next.length; ++i) {
-				String string = next[i];
-				System.out.print("\"" + string + "\"");
-				if (i < next.length - 1) {
-					System.out.print(",");
-				}
-			}
-
-			System.out.print("}");
-			if (j < array.length - 1) {
-				System.out.print(",\n");
-			}
-		}
-
-		System.out.println("}");
-	}
-
-	protected static void printHandle(DataHandle handle) {
-		Iterator<String[]> itHandle = handle.iterator();
-		printIterator(itHandle);
-	}
-
-	protected static void printIterator(Iterator<String[]> iterator) {
-		while(iterator.hasNext()) {
-			String[] next = (String[])iterator.next();
-			System.out.print("[");
-
-			for(int i = 0; i < next.length; ++i) {
-				String string = next[i];
-				System.out.print(string);
-				if (i < next.length - 1) {
-					System.out.print(", ");
-				}
-			}
-
-			System.out.println("]");
-		}
-
-	}
 	protected static void printResult(ARXResult result, Data data) {
 		DecimalFormat df1 = new DecimalFormat("#####0.00");
 		String var10000 = df1.format((double)result.getTime() / 1000.0D);
@@ -168,33 +108,46 @@ public class Main{
 			data.getDefinition().setAttributeType(head, Hierarchy.create("./data/ActivityHierarchyFinal.csv", StandardCharsets.UTF_8, ','));
 		}
 
+		ARXPopulationModel populationmodel = ARXPopulationModel.create(data.getHandle().getNumRows());
+
 		ARXAnonymizer anonymizer = new ARXAnonymizer();
 
 		ARXConfiguration config = ARXConfiguration.create();
 		config.addPrivacyModel(new KAnonymity(Integer.parseInt(args[1])));
-		config.setSuppressionLimit(0.1d); // Recommended default: 1d
+		config.setSuppressionLimit(Double.parseDouble(args[2]));
+		config.setQualityModel(Metric.createLossMetric(0d));
 		for (int i = 0; i < headers.size(); i++) {
 			String head = headers.get(i);
 			config.setAttributeWeight(head, 0.5d);
 		}
-
-		// config.setQualityModel(Metric.createEntropyMetric());
-		// config.setQualityModel(__MetricV2.createLossMetric());
-		// config.setSuppressionAlwaysEnabled(false);
 		config.setHeuristicSearchTimeLimit(1000000);
 		config.setAlgorithm(AnonymizationAlgorithm.BEST_EFFORT_GENETIC);
 		ARXResult result = anonymizer.anonymize(data, config);
+		DataHandle output = result.getOutput();
+		
+  	StatisticsQuality utility = data.getHandle().getStatistics().getQualityStatistics();
+		System.out.println("Input:");
+		System.out.println("Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+		System.out.println("Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+		System.out.println("Mixed risks");
+		System.out.println("Prosecutor re-identification risk: " + data.getHandle().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
+		System.out.println("Journalist re-identification risk: " + data.getHandle().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedJournalistRisk());
+		System.out.println("Marketer re-identification risk: " + data.getHandle().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
+        
 
-		printResult(result, data);
+		utility = output.getStatistics().getQualityStatistics();
+		System.out.println("Output:");
+		System.out.println("Non-Uniform Entropy: " + utility.getNonUniformEntropy().getArithmeticMean(false));
+		System.out.println("Precision: " + utility.getGeneralizationIntensity().getArithmeticMean(false));
+		System.out.println("Mixed risks");
+		System.out.println("Prosecutor re-identification risk: " + result.getOutput().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedProsecutorRisk());
+		System.out.println("Journalist re-identification risk: " + result.getOutput().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedJournalistRisk());
+		System.out.println("Marketer re-identification risk: " + result.getOutput().getRiskEstimator(populationmodel).getSampleBasedReidentificationRisk().getEstimatedMarketerRisk());
 
-		/*
-		System.out.println(" - Transformed data:");
-		Iterator<String[]> transformed = result.getOutput(false).iterator();
-		while (transformed.hasNext()) {
-			System.out.print(">>>");
-			System.out.println(Arrays.toString(transformed.next()));
-		}
-		*/
+		System.out.println("Statistics");
+		System.out.println(result.getOutput(result.getGlobalOptimum(), false).getStatistics().getEquivalenceClassStatistics());
+		// printResult(result, data);
+
 		result.getOutput(false).save("./results/step2/generalizedData.csv", ';');
     }
 }

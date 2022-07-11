@@ -51,8 +51,6 @@ with open('data/AllSeverityCodes.csv') as csv_file:
     # Read the file into rows object
     for row in csv_reader:
         if line_count == 0:
-            # Skip header
-            print("reading Header")
             line_count += 1
         else:
             if(rowIndex == -1):
@@ -123,4 +121,4 @@ with open('results/step1/associationMSA.csv', mode='w', newline='') as activityC
     activityWriter.writerow(headerString)
     for row in rows:
         activityWriter.writerow(row.fasta)
-print('finished')
+print('associationMSA done')

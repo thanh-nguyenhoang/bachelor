@@ -1,7 +1,8 @@
 # takes generalizedData and counts them
 import csv
+import sys
 from collections import Counter
-
+from string import Template
 
 class Sequence:
   def __init__(self, activities, count) -> None:
@@ -22,8 +23,6 @@ with open('results/step2/generalizedData.csv') as csv_file:
   currentSequence: Sequence
   for currentSequence in csv_reader:
     if line_count == 0:
-      print("reading header")
-      # activityLength = len(currentSequence)
       currentSequence.insert(0, "frequency")
       headerString = currentSequence
       line_count += 1
@@ -38,9 +37,10 @@ with open('results/step2/generalizedData.csv') as csv_file:
     tmpSequence = Sequence(sequence[0], sequence[1])
     tmpSequence.setAbsoluteFrequency()
     countedSequences.append(tmpSequence)
-  with open('results/step3/finalData.csv', mode='w', newline='') as activityCsv:
+  outputFileName = Template('results/step3/finalData$number.csv')
+  with open(outputFileName.substitute(number=sys.argv[1]), mode='w', newline='') as activityCsv:
         activityWriter = csv.writer(activityCsv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         activityWriter.writerow(headerString)
         for row in countedSequences:
             activityWriter.writerow(row.finalActivities)
-  print('finished')
+  print('finished %s' % sys.argv[1])

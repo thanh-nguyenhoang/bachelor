@@ -24,8 +24,6 @@ with open('data/AllSeverityCodes.csv') as csv_file:
     line_count = 0
     for row in csv_reader:
         if line_count == 0:
-            # Skip header
-            print("reading Header")
             line_count += 1
         else:
             if(rowIndex == -1):
@@ -60,4 +58,4 @@ with open('data/AllSeverityCodes.csv') as csv_file:
         activityWriter.writerow(headerString)
         for row in rows:
             activityWriter.writerow(row.activityEvent)
-print('finished')
+print('associationNaiv done')
